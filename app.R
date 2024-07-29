@@ -1,9 +1,11 @@
 library(shiny)
 library(leaflet)
 
+linebreaks <- function(n){HTML(strrep(br(), n))}
 # Define UI
 ui <- fluidPage(
-  titlePanel("Clickable Map with Leaflet"),
+  
+  titlePanel("Honeyguides out there honey guiding Honeyhunters" ),
   sidebarLayout(
     sidebarPanel(
       h3("Clicked Information"),
@@ -55,7 +57,15 @@ server <- function(input, output, session) {
         data = points, 
         ~lng, ~lat, 
         layerId = ~lat, # Use lat as the unique ID for simplicity
-        popup = ~Country
+        label = ~Country,
+        labelOptions = labelOptions(
+                                    style = list(
+                                      "color" = "black",
+                                      "font-family" = "serif",
+                                      "box-shadow" = "3px 3px rgba(0,0,0,0.25)",
+                                      "font-size" = "15px",
+                                      "border-color" = "rgba(0,0,0,0.5)"
+                                    ))
       )
   })
   
