@@ -1,11 +1,17 @@
 library(shiny)
 library(leaflet)
 
-linebreaks <- function(n){HTML(strrep(br(), n))}
+
 # Define UI
 ui <- fluidPage(
-  
-  titlePanel("Honeyguides out there honey guiding Honeyhunters" ),
+  fluidRow(width = 12,style = "background-color: #3d3d3d;color: white;",
+           headerPanel(h1("Honeyguide Sounds", align='center')),
+           h4("Honeyguides were out there honey guiding Honeyhunters",
+              align='center'),
+           br()
+           
+  ),
+  fluidRow(width =12,
   sidebarLayout(
     sidebarPanel(
       h3("Clicked Information"),
@@ -15,6 +21,7 @@ ui <- fluidPage(
       leafletOutput("map", width = "100%", height = 640),
       tags$style(type = "text/css", "html, body {width:100%;height:100%}")
     )
+  )
   )
 )
 
