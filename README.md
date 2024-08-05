@@ -11,7 +11,7 @@ You may download the repository and run the Shiny app in R/RStudio on your local
 ````
 ```
 #First install shiny package
-install.package("shiny")
+install.packages("shiny")
 # R-console: 
 shiny::runGitHub("Honeyguide_sound","fariedd")
 
