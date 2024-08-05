@@ -100,7 +100,7 @@ server <- function(input, output, session) {
     } else {
       
       p( style="text-align: justify;",h5("This interactive map showcases information on Africa’s honey-hunting cultures which the Honey-Hunting Research Network have been conducting research with."),
-        h5(em( "Click on any marker for more information on each region."), align = "center"))
+        h5(em( "Click on any marker for more information on each region."), align = "left"))
     }
   })
   
@@ -112,7 +112,7 @@ server <- function(input, output, session) {
       point_data <- points[points$lat == as.numeric(click), ] 
       point_data$Country
     } else {
-      " Africa's Honey-Hunting Traditions"
+      "Welcome!"
     }
    
   })
