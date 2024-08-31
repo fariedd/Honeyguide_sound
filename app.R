@@ -16,13 +16,26 @@ lapply(packages, check_and_install)
 # Define UI
 ui <- fluidPage( tagList(
   tags$head(tags$style("body{overflow:hidden;}")), #use taglist as a wrap around for tags$head to implement css (fluidPage does not have a style argument or another way to add extra CSS)
-  fluidRow(width = 12,style = "background-color: #3d3d3d;color: white;",
-           headerPanel(h2(strong( "Honey Trails: A journey through Africa's Honey-Hunting Traditions"), align='center' )),
-           h4("Discover the Richness of Africa’s Honey-Hunting Cultures with the Honey-Hunting Research Network",
-              align='center'),
-           br()
-           
+  fluidRow(width = 12,style = "background-color: #3d3d3d; color: white; display: flex; align-items: center; justify-content: space-between;",
+    column( width = 2,div(
+        style = "display: flex; justify-content: center;",
+        tags$img(src = "logos/honeyguide.png", style = "width: 50px; height: 50px;")
+      )
+    ),
+    column(width = 8,div(
+        style = "text-align: center;",
+        h2(strong("Honey Trails: A journey through Africa's Honey-Hunting Traditions")),
+        h4("Discover the Richness of Africa’s Honey-Hunting Cultures with the Honey-Hunting Research Network")
+      )
+    ),
+    column(width = 2,div(
+        style = "display: flex; justify-content: center;",
+        tags$img(src = "logos/cropped-honey.png", style = "width: 50px; height: 50px;")
+      )
+    ),
+    br()
   ),
+  
   fluidRow(width =12,
            sidebarLayout(
              sidebarPanel(width = 5,
@@ -79,11 +92,24 @@ server <- function(input, output, session) {
   )
   
   # Render leaflet map
+ leafo = makeIcon("icons/home.png", 
+                  iconWidth = 40, # Adjust the width as needed
+                  iconHeight = 40, # Adjust the height as needed
+                  iconAnchorX = 12.5, # Adjust the anchor point as needed
+                  iconAnchorY = 41)
+ defaultIcon <- makeIcon(
+   iconUrl = "icons/marker.svg",
+   iconWidth = 25, iconHeight = 41, iconAnchorX = 12, iconAnchorY = 41,
+   shadowUrl = "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png",
+   shadowWidth = 41, shadowHeight = 41, shadowAnchorX = 13, shadowAnchorY = 41
+ )
   output$map <- renderLeaflet({
     leaflet() %>%
       addProviderTiles(providers$CartoDB.VoyagerLabelsUnder) %>%
       setView(lng =  25.736678919, lat = -6.402645740, zoom = 4) %>%
+      addMarkers(lng =  19.4231, lat = -32.9221, icon = leafo, layerId = -32.9221)%>%
       addMarkers(
+       icon = defaultIcon,
         data = points, 
         ~lng, ~lat, 
         layerId = ~lat, # Use lat as the unique ID for simplicity
@@ -104,13 +130,18 @@ server <- function(input, output, session) {
   
   # Update clicked information when a marker is clicked
   observeEvent(input$map_marker_click, {
-    click_info$info <- input$map_marker_click$id
+    if(input$map_marker_click$id != "-32.9221" ){
+      click_info$info <- input$map_marker_click$id
+    }
+   
   })
   
   # Dynamically render UI for sidebar panel
   output$info_ui <- renderUI({
     click <- click_info$info
     if (!is.null(click)) {
+      if(click !="-32.9221" ){
+      
       point_data <- points[points$lat == as.numeric(click), ]
       tabsetPanel(
         tabPanel("Page1",
@@ -144,24 +175,28 @@ server <- function(input, output, session) {
         
       )
       
+      }
       
-      
-    } else {
+    }   else {
+   
       
       p( style="text-align: justify;",br(),h5("This interactive map showcases information on Africa’s 
                                          honey-hunting cultures which the Honey-Hunting Research Network
                                          have been conducting research with."),
          h5(em( "Click on any marker for more information on each region."), align = "left"))
+      
     }
   })
   
-  ###change title of side bar
-  
+  ###change title of side bar when you havent clicked on the points on map
   output$title_panel <- renderText({
     click = click_info$info
     if(!is.null(click)){
-      point_data <- points[points$lat == as.numeric(click), ] 
-      point_data$Country
+      if (click != "-32.9221"){
+        point_data <- points[points$lat == as.numeric(click), ] 
+        point_data$Country
+      }
+     
     } else {
       "Welcome!"
     }
@@ -170,10 +205,40 @@ server <- function(input, output, session) {
   observeEvent(input$home, {
     click_info$info =NULL
   })
-  
-  
+
+#create pop up for home point to add extra information
+   observeEvent(input$map_marker_click, {
+     if(!is.null(input$map_marker_click$id)){
+       if(input$map_marker_click$id  == "-32.9221"){
+         showModal(
+                    modalDialog(
+           title = "More information tab (external)",
+           tabsetPanel(
+             tabPanel("Page 1", p("Content for Tab 1")),
+             tabPanel("Page 2", p("Content for Tab 2")),
+             tabPanel("Page 3", p("Content for Tab 3"))
+           ),
+           easyClose = TRUE,
+           footer = tagList(
+             modalButton("Close")
+           ),
+           size = "l" # Set the size to large
+         ))
+         
+         
+       }
+     }
+    
+     
+  })
+   
+   
+   
   
 }
 
 # Run the application
 shinyApp(ui = ui, server = server)
+
+
+
